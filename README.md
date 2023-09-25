@@ -5,14 +5,14 @@ A portfolio of SQL queries over multiple data-sets, to be shown for Data Analyti
 This project was created in sqlite, and is based on the dataset [World Happiness Report up to 2023](https://www.kaggle.com/datasets/sazidthe1/global-happiness-scores-and-factors) provided by **kaggle**.
 
 ### Installing SQLite3
-Following the rules on [tutorialspoint](https://www.tutorialspoint.com/sqlite/sqlite_installation.htm), I
+Following the instructions on [tutorialspoint](https://www.tutorialspoint.com/sqlite/sqlite_installation.htm), I
 1. downloaded the SQLite precompiled binaries (dll and tools) from the [SQLite download page](https://www.sqlite.org/download.html)
 1. unzipped them into folder C:\sqlite
 1. added this folder to the PATH environment variable
 1. opened the command line and ran **sqlite3** to ensure it was working
 
 ### Creating the database file
-Following the rules on [tutorialspoint](https://www.tutorialspoint.com/sqlite/sqlite_create_database.htm) again, I ran the following commands on the command line:
+Following the instructions on [tutorialspoint](https://www.tutorialspoint.com/sqlite/sqlite_create_database.htm) again, I ran the following commands on the command line:
 
 ```
 cd C:\sqlite
@@ -43,7 +43,7 @@ create table load_whr
 This will allow me to import the CSV files one by one, and then apply some normalization to the data, while inserting it into "final tables" (as opposed to "load tables").
 
 ### Importing the CSV files
-To import a CSV file, I had to copy the WHR files to folder C:\sqlite\whr, and then run the following commands in SQLite:
+Following the instructions on [sqlitetutorial](https://www.sqlitetutorial.net/sqlite-import-csv/), in order to import a CSV file, I had to copy the WHR files to folder C:\sqlite\whr, and then run the following commands in SQLite:
 
 ```
 .mode csv
