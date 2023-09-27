@@ -20,7 +20,7 @@ sqlite3 WorldHappiness.db
 ```
 
 ### Creating the tables
-I created an SQL file called **load_whr.sql**, with the following contents:
+I created an SQL file called **world_happiness.sql**, with the following contents:
 
 ```
 drop table if exists load_whr;
@@ -38,9 +38,56 @@ create table load_whr
     perceptions_of_corruption       real            not null,
     constraint load_whr_PK primary key (country)
 );
+
+
+
+drop table if exists world_happiness;
+
+create table world_happiness
+(
+    year                            integer     not null,
+    country_id                      integer     not null,
+    happiness_score                 real        not null,
+    gdp_per_capita                  real        not null,
+    social_support                  real        not null,
+    healthy_life_expectancy         real        not null,
+    freedom_to_make_life_choices    real        not null,
+    generosity                      real        not null,
+    perceptions_of_corruption       real        not null,
+    constraint load_whr_PK primary key (year, country_id)
+);
+
+
+
+drop table if exists country;
+
+create table country
+(
+    id          integer         primary key,
+    name        varchar(100)    not null,
+    
+);
+
+
+
+drop table if exists region;
+
+create table region
+(
+    id          integer         primary key,
+    name        varchar(100)    not null
+);
 ```
 
-This will allow me to import the CSV files one by one, and then apply some normalization to the data, while inserting it into "final tables" (as opposed to "load tables").
+This will allow me to import the CSV files one by one, in the **load_whr** table, and then apply some normalization to the data, in the remaining tables.
+
+Following the instructions on [tutorialspoint](https://www.tutorialspoint.com/sqlite/sqlite_create_database.htm), I ran the following command on the command line:
+
+```
+sqlite3 WorldHappiness.db < world_happiness.sql
+```
+
+This creates all the tables in the SQL file inside the database.
 
 ### Importing the CSV files
 Following the instructions on [sqlitetutorial](https://www.sqlitetutorial.net/sqlite-import-csv/), in order to import a CSV file, I had to copy the WHR files to folder C:\sqlite\whr, and then run the following commands in SQLite:
