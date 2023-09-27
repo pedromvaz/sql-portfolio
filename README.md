@@ -94,15 +94,16 @@ This creates all the tables in the SQL file inside the database.
 Following the instructions on [sqlitetutorial](https://www.sqlitetutorial.net/sqlite-import-csv/), in order to import a CSV file, I had to copy the WHR files to folder C:\sqlite\whr, and then run the following commands in SQLite:
 
 ```
+delete from load_whr;
 .mode csv
 .import C:\\sqlite\\whr\\WHR_2015.csv load_whr
-select count(*) from load_whr;
 delete from load_whr where country = 'country';
 select count(*) from load_whr;
 .quit
 ```
 
 The SELECT statements proved that the data was loaded correctly (159 rows of data).
+
 The DELETE statement removed the header row from the CSV file, which would be used in case the table didn't exist prior to the import.
 
 Finally, I run the following command to execute 3 INSERT statements in an SQL file, which normalize the data in table **load_whr**:
@@ -152,11 +153,14 @@ select
 from load_whr l
 inner join country c
     on l.country = c.name
-inner join world_happiness h
+left outer join world_happiness h
     on c.id = h.country_id
     and h.year = 2015
 where h.country_id is null;
 ```
 
 To note that we need to update the year in the last INSERT, depending on the file we're loading.
+
 Also to note, these INSERT statements only insert new data in each table, so no errors should be thrown in case we import the same file more than once.
+
+After going through the various WHR files, I found out that the 2017 and 2018 ones had a duplicate line for Cyprus, which I had to remove manually before loading into the table.
