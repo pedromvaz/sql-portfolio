@@ -102,9 +102,9 @@ select count(*) from load_whr;
 .quit
 ```
 
-The SELECT statements proved that the data was loaded correctly (159 rows of data).
+The DELETE statement removes the header row from the CSV file, which would be used in case the table didn't exist prior to the import.
 
-The DELETE statement removed the header row from the CSV file, which would be used in case the table didn't exist prior to the import.
+The SELECT statement proves that the data was loaded correctly (158 rows of data).
 
 Finally, I run the following command to execute 3 INSERT statements in an SQL file, which normalize the data in table **load_whr**:
 
