@@ -1,83 +1,29 @@
 # World Happiness Report
+
 This project was created in sqlite, and is based on the dataset [World Happiness Report up to 2023](https://www.kaggle.com/datasets/sazidthe1/global-happiness-scores-and-factors) provided by **kaggle**.
 
 ## Installing SQLite3
+
 Following the instructions on [tutorialspoint](https://www.tutorialspoint.com/sqlite/sqlite_installation.htm), I
 1. downloaded the SQLite precompiled binaries (dll and tools) from the [SQLite download page](https://www.sqlite.org/download.html)
-1. unzipped them into folder C:\sqlite
-1. added this folder to the PATH environment variable
-1. opened the command line and ran **sqlite3** to ensure it was working
+2. unzipped them into folder `C:\sqlite`
+3. added this folder to the `PATH` environment variable
+4. opened the command line and ran `sqlite3` to ensure it was working
 
 ## Creating the database file
+
 Following the instructions on [tutorialspoint](https://www.tutorialspoint.com/sqlite/sqlite_create_database.htm) again, I ran the following commands on the command line:
 
 ```
-cd C:\sqlite
+cd .\world_happiness
 sqlite3 WorldHappiness.db
 ```
 
 ## Creating the tables
-I created an SQL file called **world_happiness.sql**, with the following contents:
 
-```
-drop table if exists load_whr;
+I created an SQL file called [world_happiness.sql](./world_happiness.sql) to create all the required tables for this project.
 
-create table load_whr
-(
-    country                         varchar(100)    not null,
-    region                          varchar(100)    not null,
-    happiness_score                 real            not null,
-    gdp_per_capita                  real            not null,
-    social_support                  real            not null,
-    healthy_life_expectancy         real            not null,
-    freedom_to_make_life_choices    real            not null,
-    generosity                      real            not null,
-    perceptions_of_corruption       real            not null,
-    constraint load_whr_PK primary key (country)
-);
-
-
-
-drop table if exists world_happiness;
-
-create table world_happiness
-(
-    year                            integer     not null,
-    country_id                      integer     not null,
-    happiness_score                 real        not null,
-    gdp_per_capita                  real        not null,
-    social_support                  real        not null,
-    healthy_life_expectancy         real        not null,
-    freedom_to_make_life_choices    real        not null,
-    generosity                      real        not null,
-    perceptions_of_corruption       real        not null,
-    constraint load_whr_PK primary key (year, country_id)
-);
-
-
-
-drop table if exists country;
-
-create table country
-(
-    id          integer         primary key,
-    name        varchar(100)    not null,
-    region_id   integer         not null,
-    constraint region_FK foreign key (region_id) references region(id)
-);
-
-
-
-drop table if exists region;
-
-create table region
-(
-    id          integer         primary key,
-    name        varchar(100)    not null
-);
-```
-
-This will allow me to import the CSV files one by one, in the **load_whr** table, and then apply some normalization to the data, in the remaining tables.
+This will allow me to import the CSV files one by one, in the `load_whr` table, and then apply some normalization to the data, in the remaining tables.
 
 Following the instructions on [tutorialspoint](https://www.tutorialspoint.com/sqlite/sqlite_create_database.htm), I ran the following command on the command line:
 
@@ -85,80 +31,69 @@ Following the instructions on [tutorialspoint](https://www.tutorialspoint.com/sq
 sqlite3 WorldHappiness.db < world_happiness.sql
 ```
 
-This creates all the tables in the SQL file inside the database.
+This created all the tables from the SQL file inside the database.
 
 ## Importing the CSV files
-Following the instructions on [sqlitetutorial](https://www.sqlitetutorial.net/sqlite-import-csv/), in order to import a CSV file, I had to copy the WHR files to folder C:\sqlite\whr, and then run the following commands in SQLite:
+
+Following the instructions on [sqlitetutorial](https://www.sqlitetutorial.net/sqlite-import-csv/), in order to import a CSV file, I had to copy the [WHR files](https://www.kaggle.com/datasets/sazidthe1/global-happiness-scores-and-factors/download?datasetVersionNumber=1) to folder `.\world_happiness\data`, and then run the following commands in SQLite:
 
 ```
 delete from load_whr;
 .mode csv
-.import C:\\sqlite\\whr\\WHR_2015.csv load_whr
+.import .\\data\\WHR_2015.csv load_whr
 delete from load_whr where country = 'country';
 select count(*) from load_whr;
 .quit
 ```
 
-The DELETE statement removes the header row from the CSV file, which would be used in case the table didn't exist prior to the import.
+The `delete` statement removes the header row from the CSV file, which would be used in case the table didn't exist prior to the `.import`.
 
-The SELECT statement proves that the data was loaded correctly (158 rows of data).
+The `select` statement proves that the data was loaded correctly (158 rows of data).
 
-Finally, I ran the following command, which executes 3 INSERT statements inside an SQL file.
-These INSERT statements normalize the data in table **load_whr**:
+Finally, I ran the following command, which executes 3 `insert` statements inside an SQL file called [normalize_happiness_data.sql](./normalize_happiness_data.sql).
+These `insert` statements normalize the data present in table `load_whr` at the time:
 
 ```
 sqlite3 WorldHappiness.db < normalize_happiness_data.sql
 ```
 
-This file has the following INSERT statements:
+A few notes on the SQL file:
+- We need to update the year in the last `insert` (e.g. 2015), depending on the file we're loading (e.g. `WHR_2015.csv`)
+- The `insert` statements only add new data to each table, based on their `primary key`, so no errors should occur in case we import the same file more than once
+
+After going through the various WHR files, I found out that the ones related to 2017 and 2018 had a duplicate line for Cyprus, which I had to remove manually before successfully loading the data into the table.
+
+## Querying the data
+
+Having all the data inserted correctly in tables `region`, `country`, and `world_happiness`, I created a new SQL file called [world_happiness_queries.sql](./world_happiness_queries.sql), where I use various SQL elements like `inner join`, `order by`, `group by`, `cast`, `round`, and aggregate functions.
+
+The way I did this was to first open a database connection, as before:
 
 ```
--- insert new regions
-insert into region (name)
-select
-    l.region
-from load_whr l
-left outer join region r
-    on l.region = r.name
-where r.name is null;
-
-
--- insert new countries
-insert into country (name, region_id)
-select
-    l.country,
-    r.id
-from load_whr l
-left outer join country c
-    on l.country = c.name
-left outer join region r
-    on l.region = r.name
-where c.name is null;
-
-
--- insert happiness for all countries in a certain year
-insert into world_happiness
-select
-    2015,
-    c.id,
-    l.happiness_score,
-    l.gdp_per_capita,
-    l.social_support,
-    l.healthy_life_expectancy,
-    l.freedom_to_make_life_choices,
-    l.generosity,
-    l.perceptions_of_corruption
-from load_whr l
-inner join country c
-    on l.country = c.name
-left outer join world_happiness h
-    on c.id = h.country_id
-    and h.year = 2015
-where h.country_id is null;
+cd .\world_happiness
+sqlite3 WorldHappiness.db
 ```
 
-To note that we need to update the year in the last INSERT (e.g. 2015), depending on the file we're loading.
+Then I opened the SQL file in a text editor, copied one of the queries in it, and ran it in SQLite, like so:
 
-Also to note, these INSERT statements only insert new data in each table, so no errors should be thrown in case we import the same file more than once.
+```
+SQLite version 3.43.1 2023-09-11 12:01:27
+Enter ".help" for usage hints.
+sqlite> .headers on
+sqlite> .mode columns
+sqlite> select
+   ...>     'Highest happiness',
+   ...>     c.name,
+   ...>     h.happiness_score,
+   ...>     h.year
+   ...> from world_happiness h
+   ...> inner join country c
+   ...>     on h.country_id = c.id
+   ...> order by h.happiness_score desc
+   ...> limit 1;
+'Highest happiness'  name     happiness_score  year
+-------------------  -------  ---------------  ----
+Highest happiness    Finland  7.842            2021
+```
 
-After going through the various WHR files, I found out that the 2017 and 2018 ones had a duplicate line for Cyprus, which I had to remove manually before loading into the table.
+The commands `.headers on` and `.mode columns` help visualize the data by showing the column names, and aligning the data in their respective columns.
