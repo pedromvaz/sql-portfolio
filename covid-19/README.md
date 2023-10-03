@@ -65,7 +65,7 @@ Copy & paste the file's contents into the Command Line Client, which in turn wil
 
 ## Importing the CSV file
 
-To import the CSV file, and assuming you're using MySQL 8, you need to change 2 configurations:
+To import the CSV file, and assuming you're using MySQL 8, you need to change 2 configurations (found this on [stackoverflow](https://stackoverflow.com/questions/63361962/error-2068-hy000-load-data-local-infile-file-request-rejected-due-to-restrict)):
 - One on the server
 - Another on the client
 
@@ -96,7 +96,7 @@ NEW
 "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" "--defaults-file=C:\ProgramData\MySQL\MySQL Server 8.0\my.ini" "--local-infile=1" "-uroot" "-p"
 ```
 
-Then, you can run the following command inside the client:
+Then, you can run the following command inside the client (found this on [n8n](https://blog.n8n.io/import-csv-into-mysql/)):
 
 ```
 mysql> use covid;
