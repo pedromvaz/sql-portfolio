@@ -4,17 +4,20 @@ This project was created in MySql, and is based on the dataset [Data on the dail
 
 ## Installing MySql
 
-Following the instructions on [dev.mysql.com](https://dev.mysql.com/doc/refman/5.7/en/windows-installation.html#windows-installation-simple), I
-1. downloaded the MySql installer for Windows
-2. used all the default options in the Setup Wizard
-3. chose a master password, and then a username and its password, for the database
-4. opened the MySQL 8.0 Command Line Client and entered the master password, to ensure it was working
+Follow the instructions on [dev.mysql.com](https://dev.mysql.com/doc/refman/5.7/en/windows-installation.html#windows-installation-simple):
+1. Download the MySql installer for Windows
+2. Use all the default options in the Setup Wizard
+3. Choose a password for the `root` user
+4. Create your own username and give it a password
+5. Open the MySQL 8.0 Command Line Client and enter the root password, to ensure everything is set up properly
 
 ## Creating the database
 
 By following the Setup Wizard and its default options, a database server is created automatically, and it runs as a service every time Windows starts.
 
-When we open the MySQL 8.0 Command Line Client, we can run the `show databases` command to find that there are, in fact, some databases already created during the installation.
+Follow the instructions on [dev.mysql.com](https://dev.mysql.com/doc/mysql-getting-started/en/):
+- Open the MySQL 8.0 Command Line Client
+- Run the `show databases` command. You will find that there are some databases already created.
 
 ```
 mysql> show databases;
@@ -31,7 +34,7 @@ mysql> show databases;
 6 rows in set (0.01 sec)
 ```
 
-We can then create our own database for Covid-19 related data, with the `create database` command:
+- Create your own database for Covid-19 related data, with the `create database` command:
 
 ```
 mysql> create database covid;
@@ -54,12 +57,69 @@ mysql> show databases;
 
 ## Creating the tables
 
-I created an SQL file called [daily_covid_stats.sql](./daily_covid_stats.sql) to create all the required tables for this project.
+There is an SQL file called [daily_covid_stats.sql](./daily_covid_stats.sql) to create all the required tables for this project.
 
-This will allow me to import the CSV file into the `load_covid_stats` table, and then apply some normalization to the data, in the remaining tables.
+This will allow you to import the CSV file into the `load_covid_stats` table, and then apply some normalization to the data, in the remaining tables.
 
-I copy-pasted the file's contents into the Command Line Client, which in turn created all the tables from the SQL file inside the database.
+Copy & paste the file's contents into the Command Line Client, which in turn will create all the tables from the SQL file inside the database.
 
-## Importing the CSV files
+## Importing the CSV file
+
+To import the CSV file, and assuming you're using MySQL 8, you need to change 2 configurations:
+- One on the server
+- Another on the client
+
+On the server, once you connect to the database, run the following command:
+
+```
+mysql> SET GLOBAL local_infile = true;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SHOW GLOBAL VARIABLES LIKE 'local_infile';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| local_infile  | ON    |
++---------------+-------+
+1 row in set (0.00 sec)
+```
+
+On the client, you need to add a parameter to the command used to start the MySQL 8.0 Command Line Client:
+
+```
+OLD
+---
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" "--defaults-file=C:\ProgramData\MySQL\MySQL Server 8.0\my.ini" "-uroot" "-p"
+
+NEW
+---
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" "--defaults-file=C:\ProgramData\MySQL\MySQL Server 8.0\my.ini" "--local-infile=1" "-uroot" "-p"
+```
+
+Then, you can run the following command inside the client:
+
+```
+mysql> use covid;
+Database changed
+mysql> LOAD DATA LOCAL INFILE 'C:/Users/Pedro/PycharmProjects/sql-portfolio/covid-19/data/covid_stats.csv'
+    -> INTO TABLE load_covid_stats
+    -> FIELDS TERMINATED BY ','
+    -> LINES TERMINATED BY '\n'
+    -> IGNORE 1 ROWS;
+Query OK, 28729 rows affected, 385 warnings (1.14 sec)
+Records: 28729  Deleted: 0  Skipped: 0  Warnings: 385
+```
+
+There are several warnings in the output of the previous command, but all the lines from the CSV file should now be in the table (except for the header line):
+
+```
+mysql> select count(*) from load_covid_stats;
++----------+
+| count(*) |
++----------+
+|    28729 |
++----------+
+1 row in set (0.01 sec)
+```
 
 ## Querying the data

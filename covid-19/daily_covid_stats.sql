@@ -5,7 +5,7 @@ drop table if exists load_covid_stats;
 
 create table load_covid_stats
 (
-    the_date                            date            not null,
+    the_date                            char(10)        not null,
     the_day                             integer         not null,
     the_month                           integer         not null,
     the_year                            integer         not null,
