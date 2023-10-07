@@ -1,6 +1,8 @@
 # Covid-19
 
-This project was created in MySql, and is based on the dataset [Data on the daily number of new reported COVID-19 cases and deaths by EU/EEA country](https://www.ecdc.europa.eu/en/publications-data/data-daily-new-cases-covid-19-eueea-country) provided by the **ECDC**.
+This project was created in MySql, and is based on the dataset [COVID-19 Data Explorer](https://ourworldindata.org/the-coronavirus-pandemic-data-explorer) provided by [Our World In Data](https://ourworldindata.org/).
+
+At the time of writing this README file, the dataset is almost 90MB in size, so I will not be putting it in my repository. You can download it [here](https://github.com/owid/covid-19-data/blob/master/public/data/owid-covid-data.csv).
 
 ## Installing MySql
 
@@ -69,7 +71,14 @@ To import the CSV file, and assuming you're using MySQL 8, you need to change 2 
 - One on the server
 - Another on the client
 
-On the server, once you connect to the database, run the following command:
+On the server, once you connect to the database, run the following commands:
+
+```
+SET GLOBAL local_infile = true;
+SHOW GLOBAL VARIABLES LIKE 'local_infile';
+```
+
+Here is the expected output:
 
 ```
 mysql> SET GLOBAL local_infile = true;
@@ -96,7 +105,19 @@ NEW
 "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" "--defaults-file=C:\ProgramData\MySQL\MySQL Server 8.0\my.ini" "--local-infile=1" "-uroot" "-p"
 ```
 
-Then, you can run the following command inside the client (found this on [n8n](https://blog.n8n.io/import-csv-into-mysql/)):
+Then, you can run the following commands inside the client (found this on [n8n](https://blog.n8n.io/import-csv-into-mysql/)):
+
+```
+USE covid;
+
+LOAD DATA LOCAL INFILE 'C:/Users/Pedro/PycharmProjects/sql-portfolio/covid-19/data/owid-covid-data.csv'
+INTO TABLE load_covid_stats
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+```
+
+Here is the expected output:
 
 ```
 mysql> use covid;
