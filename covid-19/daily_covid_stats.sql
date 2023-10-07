@@ -77,6 +77,8 @@ create table load_covid_stats
 
 
 
+drop table if exists daily_covid_stats;
+drop table if exists location;
 drop table if exists continent;
 
 create table continent
@@ -86,48 +88,40 @@ create table continent
     constraint continent_PK primary key (id)
 );
 
-
-
-drop table if exists location;
-
 create table location
 (
     id              integer unsigned    not null auto_increment,
     iso_code        varchar(10)         not null,
-    name            varchar(50)        not null,
+    name            varchar(50)         not null,
     population      decimal(15,1)       not null,
-    continent_id    integer unsigned    not null,
+    continent_id    integer unsigned    null,
     constraint location_PK primary key (id),
     constraint continent_FK foreign key (continent_id) references continent(id)
 );
-
-
-
-drop table if exists daily_covid_stats;
 
 create table daily_covid_stats
 (
     location_id                 integer unsigned    not null,
     on_date                     date                not null,
-    total_cases                 decimal(15,1)       null,
-    new_cases                   decimal(15,1)       null,
-    total_deaths                decimal(15,1)       null,
-    new_deaths                  decimal(15,1)       null,
-    reproduction_rate           decimal(5,2)        null,
-    icu_patients                decimal(15,1)       null,
-    hosp_patients               decimal(15,1)       null,
-    weekly_icu_admissions       decimal(15,1)       null,
-    weekly_hosp_admissions      decimal(15,1)       null,
-    total_tests                 decimal(15,1)       null,
-    new_tests                   decimal(15,1)       null,
+    total_cases                 decimal(15,3)       null,
+    new_cases                   decimal(15,3)       null,
+    total_deaths                decimal(15,3)       null,
+    new_deaths                  decimal(15,3)       null,
+    reproduction_rate           decimal(15,3)       null,
+    icu_patients                decimal(15,3)       null,
+    hosp_patients               decimal(15,3)       null,
+    weekly_icu_admissions       decimal(15,3)       null,
+    weekly_hosp_admissions      decimal(15,3)       null,
+    total_tests                 decimal(15,3)       null,
+    new_tests                   decimal(15,3)       null,
     positive_rate               decimal(8,6)        null,
-    tests_per_case              decimal(6,4)        null,
-    total_vaccinations          decimal(15,1)       null,
-    people_vaccinated           decimal(15,1)       null,
-    people_fully_vaccinated     decimal(15,1)       null,
-    total_boosters              decimal(15,1)       null,
-    new_vaccinations            decimal(15,1)       null,
-    life_expectancy             decimal(6,3)        null,
+    tests_per_case              decimal(15,3)       null,
+    total_vaccinations          decimal(15,3)       null,
+    people_vaccinated           decimal(15,3)       null,
+    people_fully_vaccinated     decimal(15,3)       null,
+    total_boosters              decimal(15,3)       null,
+    new_vaccinations            decimal(15,3)       null,
+    life_expectancy             decimal(8,4)        null,
     constraint daily_covid_stats_PK primary key (location_id, on_date),
     constraint location_FK foreign key (location_id) references location(id)
 );

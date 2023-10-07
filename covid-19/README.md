@@ -2,7 +2,7 @@
 
 This project was created in MySql, and is based on the dataset [COVID-19 Data Explorer](https://ourworldindata.org/the-coronavirus-pandemic-data-explorer) provided by [Our World In Data](https://ourworldindata.org/).
 
-At the time of writing this README file, the dataset is almost 90MB in size, so I will not be putting it in my repository. You can download it [here](https://github.com/owid/covid-19-data/blob/master/public/data/owid-covid-data.csv).
+At the time of writing this README file, the dataset is almost 90MB in size, so I will not be putting it in my repository. You can download it [here](https://github.com/owid/covid-19-data/blob/master/public/data/owid-covid-data.csv), then copy the CSV file to the `data` folder.
 
 ## Installing MySql
 
@@ -120,27 +120,27 @@ IGNORE 1 ROWS;
 Here is the expected output:
 
 ```
-mysql> use covid;
+mysql> USE covid;
 Database changed
-mysql> LOAD DATA LOCAL INFILE 'C:/Users/Pedro/PycharmProjects/sql-portfolio/covid-19/data/covid_stats.csv'
+mysql> LOAD DATA LOCAL INFILE 'C:/Users/Pedro/PycharmProjects/sql-portfolio/covid-19/data/owid-covid-data.csv'
     -> INTO TABLE load_covid_stats
     -> FIELDS TERMINATED BY ','
     -> LINES TERMINATED BY '\n'
     -> IGNORE 1 ROWS;
-Query OK, 28729 rows affected, 385 warnings (1.14 sec)
-Records: 28729  Deleted: 0  Skipped: 0  Warnings: 385
+Query OK, 346549 rows affected, 65535 warnings (30.87 sec)
+Records: 346549  Deleted: 0  Skipped: 0  Warnings: 10375871
 ```
 
-There are several warnings in the output of the previous command, but all the lines from the CSV file should now be in the table (except for the header line):
+There is a huge number of warnings in the output of the previous command, probably due to all the missing values in the CSV file, but all the lines from the CSV file should now be in the table (except for the header line):
 
 ```
 mysql> select count(*) from load_covid_stats;
 +----------+
 | count(*) |
 +----------+
-|    28729 |
+|   346549 |
 +----------+
-1 row in set (0.01 sec)
+1 row in set (1.84 sec)
 ```
 
 ## Querying the data
