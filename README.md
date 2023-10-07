@@ -8,4 +8,4 @@ This project was created in sqlite, and is based on the dataset [World Happiness
 
 ## Covid-19
 
-This project was created in MySql, and is based on the dataset [Data on the daily number of new reported COVID-19 cases and deaths by EU/EEA country](https://www.ecdc.europa.eu/en/publications-data/data-daily-new-cases-covid-19-eueea-country) provided by the **ECDC**.
+This project was created in MySql, and is based on the dataset [COVID-19 Data Explorer](https://ourworldindata.org/the-coronavirus-pandemic-data-explorer) provided by [Our World In Data](https://ourworldindata.org/).
