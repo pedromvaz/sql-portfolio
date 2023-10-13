@@ -71,7 +71,7 @@ To import the CSV file, and assuming you're using MySQL 8, you need to change 2 
 - One on the server
 - Another on the client
 
-On the server, once you connect to the database, run the following commands:
+On the client, once you connect to the database, run the following commands:
 
 ```
 SET GLOBAL local_infile = true;
@@ -144,3 +144,46 @@ mysql> select count(*) from load_covid_stats;
 ```
 
 ## Querying the data
+
+Having all the data inserted correctly in tables `continent`, `location`, and `daily_covid_stats`, I created a new SQL file called [covid_queries.sql](./covid_queries.sql), where I use various SQL elements like `inner join`, `order by`, `group by`, `having`, CTEs, and aggregate functions.
+
+Open a database connection in the MySQL client.
+
+Open the SQL file in a text editor, copy one of the queries in it, paste it into the MySQL client, and run it, like so:
+
+```
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 9
+Server version: 8.0.34 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> use covid;
+Database changed
+mysql> select
+    ->     l.name as location,
+    ->     c.new_deaths,
+    ->     c.on_date
+    -> from daily_covid_stats c
+    -> inner join location l
+    ->     on c.location_id = l.id
+    ->     and l.continent_id is not null
+    -> order by new_deaths desc
+    -> limit 5;
++----------+------------+------------+
+| location | new_deaths | on_date    |
++----------+------------+------------+
+| Chile    |  11447.000 | 2022-03-22 |
+| Ecuador  |   8786.000 | 2021-07-21 |
+| Germany  |   6460.000 | 2020-12-20 |
+| India    |   6148.000 | 2021-06-10 |
+| Spain    |   5841.000 | 2020-04-05 |
++----------+------------+------------+
+5 rows in set (0.56 sec)
+```
