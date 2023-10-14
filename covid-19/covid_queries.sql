@@ -145,3 +145,58 @@ inner join location_stats s
     on c.id = s.continent_id
 group by c.name
 order by death_percentage desc;
+
+-- check the progress of vaccinations in Portugal over time
+select
+    c.on_date,
+    c.people_vaccinated,
+    c.people_vaccinated / l.population * 100.0 as vaccination_pct,
+    c.people_fully_vaccinated,
+    c.people_fully_vaccinated / l.population * 100.0 as full_vaccination_pct,
+    l.population
+from daily_covid_stats c
+inner join location l
+    on c.location_id = l.id
+    and l.continent_id is not null
+where l.name = "Portugal"
+and c.people_vaccinated > 0;
+
+-- find the locations with the highest percentage of vaccinations (against the total population)
+--
+-- base on my findings, some countries have a percentage over 100%, which suggests their numbers are wrong
+-- (either their total population, or the total number of vaccinated people)
+select
+    l.name,
+    max(l.population) as population,
+    max(c.people_vaccinated) as vaccinations,
+    max(c.people_vaccinated) / max(l.population) * 100.0 as vaccination_pct,
+    max(c.people_fully_vaccinated) as full_vaccinations,
+    max(c.people_fully_vaccinated) / max(l.population) * 100.0 as full_vaccination_pct
+from daily_covid_stats c
+inner join location l
+    on c.location_id = l.id
+    and l.continent_id is not null
+group by l.name
+having vaccination_pct <= 100.0
+order by vaccination_pct desc
+limit 10;
+
+-- find the locations with the lowest percentage of vaccinations (against the total population)
+--
+-- base on my findings, some countries have a percentage of 0%, which suggests that either the numbers were not made
+-- public, or they never got any vaccines for their population, or the numbers are incorrect
+select
+    l.name,
+    max(l.population) as population,
+    max(c.people_vaccinated) as vaccinations,
+    max(c.people_vaccinated) / max(l.population) * 100.0 as vaccination_pct,
+    max(c.people_fully_vaccinated) as full_vaccinations,
+    max(c.people_fully_vaccinated) / max(l.population) * 100.0 as full_vaccination_pct
+from daily_covid_stats c
+inner join location l
+    on c.location_id = l.id
+    and l.continent_id is not null
+group by l.name
+having vaccination_pct > 0.0
+order by vaccination_pct
+limit 10;
