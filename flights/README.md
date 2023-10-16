@@ -9,16 +9,25 @@ Follow these instructions:
 2. Download the installer
 3. Follow the installation wizard, and choose the default options
 4. Choose a password for the database superuser
-5. If/When installing Stack Builder, choose the "PostgreSQL ..." option on the first screen, and then choose the psqlODBC database drivers (32 bit and 64 bit)  
-
+5. Do not run the Stack Builder at the end of the installation  
 
 ## Creating the database
 
+When the PostgreSQL installation finishes, open the pgAdmin application.
+
+By following the Setup Wizard and its default options, a database server should have been created automatically.
+
+In pgAdmin, connect to the database server listed on the left side, inputting the password you chose during the installation.
+
+The connection should be successful. You should see a single database there, called "postgres", an inside it there should be a single schema called "public", with nothing in it.
 
 ## Creating the tables
 
+You will be creating the tables related to the Flights datasets inside the "public" schema you saw earlier.
 
-## Importing the CSV file
+
+
+## Importing the CSV files
 
 The datasets from OpenFlights are available in .dat files, although their contents are that of .csv files. There are empty values and `\N` values, and there are some values surrounded by quotes, but not all of them.
 
