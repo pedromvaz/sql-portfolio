@@ -43,5 +43,18 @@ I decided to do the following changes, so the datasets are easier to import into
   - add a header row with the names of all the columns in each dataset, based on the information in the [OpenFlights website](https://openflights.org/data)
   - remove any rows with `id = -1`
   - on the countries' dataset, I had to adjust 2 names that contained commas, and Excel didn't handle that properly
+  - replace the sequence `\\'` with simply `'`
+
+In order to import each CSV file into its respective `load` table:
+1. Open pgAdmin
+2. Connect to the PostgreSQL server
+3. Find the `public` schema inside the `postgres` database
+4. Find the `load` table for the CSV file you want to import
+5. Right-click on the table, and click on the "Import..." option in the menu
+6. On the File Options tab, select the file you want to import, change the format to "csv", and the encoding to "UTF8"
+7. On the Misc. Options tab, select the Header checkbox, and set the delimiter to the semicolon (;)
+8. Click on the "Import" button, and it should be successful
+
+To confirm the successful import of the data, right-click on the table, hover over the "View Data" option in the menu, and then choose one of the sub-options. You should see some, or all, of the data in a new window.
 
 ## Querying the data
