@@ -25,7 +25,11 @@ The connection should be successful. You should see a single database there, cal
 
 You will be creating the tables related to the Flights datasets inside the "public" schema you saw earlier.
 
+There is an SQL file called [flights_tables.sql](./flights_tables.sql) to create all the required tables for this project.
 
+This will allow you to import the CSV files into the `load` tables, and then apply some normalization to the data, in the remaining tables.
+
+The contents of the SQL file can be run directly in pgAdmin, by selecting the `public` schema, and opening the SQL Editor via the "Execute arbitrary SQL queries." tool bar button.
 
 ## Importing the CSV files
 
