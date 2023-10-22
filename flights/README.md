@@ -57,4 +57,15 @@ In order to import each CSV file into its respective `load` table:
 
 To confirm the successful import of the data, right-click on the table, hover over the "View Data" option in the menu, and then choose one of the sub-options. You should see some, or all, of the data in a new window.
 
+## Data checks
+
+After importing the data, I started looking at the data, and found a lot of empty values. When I started looking at the empty values in detail, I started finding duplicate data.
+
+I decided to create some queries for each dataset, to make some detailed checks on the data. The files I created are:
+- [airlines_data_checks.sql](./airlines_data_checks.sql)
+- [airports_data_checks.sql](./airports_data_checks.sql)
+- [countries_data_checks.sql](./countries_data_checks.sql)
+- [planes_data_checks.sql](./planes_data_checks.sql)
+- [routes_data_checks.sql](./routes_data_checks.sql)
+
 ## Querying the data
