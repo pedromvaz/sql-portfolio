@@ -32,6 +32,7 @@ where iso_code in (
 order by name;
 
 -- deleting wrong entries in load_countries
+-- based on https://www.geodatasource.com/resources/tutorials/international-country-code-fips-versus-iso-3166/
 delete from load_countries
 where name = 'India' and dafif_code = 'BS';
 
