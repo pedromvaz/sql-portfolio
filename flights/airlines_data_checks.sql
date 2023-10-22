@@ -11,14 +11,14 @@ select
 	sum(case when active is null or length(trim(active)) = 0 then 1 else 0 end) as total_empty_actives
 from load_airlines;
 
--- check if there are repeatead names (70!)
+-- check if there are repeated names (70!)
 select name, count(*)
 from load_airlines
 where trim(name) != ''
 group by name
 having count(*) > 1;
 
--- check if there are repeatead names by activity / inactivity (6 active!, 52 inactive)
+-- check if there are repeated names by activity / inactivity (6 active!, 52 inactive)
 select active, name, count(*)
 from load_airlines
 where trim(name) != ''
@@ -40,21 +40,21 @@ where name in (
 and upper(active) = 'Y'
 order by name;
 
--- check if there are repeatead aliases (0)
+-- check if there are repeated aliases (0)
 select alias, count(*)
 from load_airlines
 where trim(alias) != ''
 group by alias
 having count(*) > 1;
 
--- check if there are repeatead iata codes (320!!)
+-- check if there are repeated iata codes (320!!)
 select iata_code, count(*)
 from load_airlines
 where trim(iata_code) != ''
 group by iata_code
 having count(*) > 1;
 
--- check if there are repeatead iata codes by activity / inactivity (19 active!, 103 inactive)
+-- check if there are repeated iata codes by activity / inactivity (19 active!, 103 inactive)
 select active, iata_code, count(*)
 from load_airlines
 where trim(iata_code) != ''
@@ -76,7 +76,7 @@ where iata_code in (
 and upper(active) = 'Y'
 order by name;
 
--- check if there are repeatead icao codes (34!)
+-- check if there are repeated icao codes (34!)
 select icao_code, count(*)
 from load_airlines
 where trim(icao_code) != ''
@@ -106,14 +106,14 @@ where icao_code in (
 and upper(active) = 'Y'
 order by icao_code;
 
--- check if there are repeatead callsigns (44!)
+-- check if there are repeated callsigns (44!)
 select callsign, count(*)
 from load_airlines
 where trim(callsign) != ''
 group by callsign
 having count(*) > 1;
 
--- check if there are repeatead callsigns by activity / inactivity (11 active!, 10 inactive)
+-- check if there are repeated callsigns by activity / inactivity (11 active!, 10 inactive)
 select active, callsign, count(*)
 from load_airlines
 where trim(callsign) != ''
