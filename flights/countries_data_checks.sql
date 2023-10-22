@@ -1,8 +1,10 @@
 
+-- count empty values for each column, vs total lines in the load table
 select
 	count(*) as total_lines,
-	sum(case when iso_code is null or length(trim(iso_code)) = 0 then 1 else 0 end) as total_empty_types,
-	sum(case when dafif_code is null or length(trim(dafif_code)) = 0 then 1 else 0 end) as total_empty_sources
+	sum(case when name is null or length(trim(name)) = 0 then 1 else 0 end) as total_empty_names,
+	sum(case when iso_code is null or length(trim(iso_code)) = 0 then 1 else 0 end) as total_empty_iso_codes,
+	sum(case when dafif_code is null or length(trim(dafif_code)) = 0 then 1 else 0 end) as total_empty_dafif_codes
 from load_countries;
 
 -- check if there are repeated iso codes (2)
