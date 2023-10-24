@@ -49,3 +49,15 @@ from load_airports
 where trim(icao_code) != ''
 group by icao_code
 having count(*) > 1;
+
+-- check if there are cities with the same name, but from different countries (121!!)
+select city, count(distinct country) as different_countries
+from load_airports
+where city is not null
+group by city
+having count(distinct country) > 1;
+
+-- list the countries from the first city in the previous query (UK, USA)
+select distinct city, country
+from load_airports
+where city = 'Aberdeen';

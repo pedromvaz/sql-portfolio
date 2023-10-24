@@ -1,4 +1,6 @@
 
+-- LOAD TABLES
+
 drop table if exists load_airlines;
 
 create table load_airlines
@@ -67,4 +69,92 @@ create table load_routes
     stops                   smallint null,
     equipment               varchar(50) null,
     constraint load_routes_PK primary key (airline, source_airport, destination_airport)
+);
+
+-- FINAL TABLES
+
+drop table if exists routes;
+drop table if exists airlines;
+drop table if exists airports;
+drop table if exists cities;
+drop table if exists countries;
+drop table if exists planes;
+
+
+create sequence if not exists countries_seq;
+
+create table countries
+(
+    id              integer         not null    primary key default nextval('countries_seq'),
+    name            varchar(100)    not null,
+    iso_code        char(2)         null,
+    dafif_code      char(2)         null
+);
+
+
+create sequence if not exists cities_seq;
+
+create table cities
+(
+    id              integer         not null    primary key default nextval('cities_seq'),
+    name            varchar(100)    not null,
+    country_id      integer         not null,
+    constraint country_FK foreign key (country_id) references countries(id)
+);
+
+
+create sequence if not exists airports_seq;
+
+create table airports
+(
+    id              integer         not null    primary key default nextval('airports_seq'),
+    name            varchar(100)    not null,
+    city_id         integer         null,
+    country_id      integer         not null,
+    iata_code       char(3)         null,
+    icao_code       char(4)         null,
+    altitude        integer         not null,
+    constraint city_FK foreign key (city_id) references cities(id),
+    constraint country_FK foreign key (country_id) references countries(id)
+);
+
+
+create sequence if not exists airlines_seq;
+
+create table airlines
+(
+    id              integer         not null    primary key default nextval('airlines_seq'),
+    name            varchar(100)    not null,
+    iata_code       char(2)         null,
+    icao_code       char(3)         null,
+    active          boolean         null,
+    country_id      integer         null,
+    constraint country_FK foreign key (country_id) references countries(id)
+);
+
+
+create sequence if not exists planes_seq;
+
+create table planes
+(
+    id              integer         not null    primary key default nextval('planes_seq'),
+    name            varchar(100)    not null,
+    iata_code       char(3)         null,
+    icao_code       char(4)         null
+);
+
+
+create sequence if not exists routes_seq;
+
+create table routes
+(
+    id                      integer         not null    primary key default nextval('routes_seq'),
+    airline_id              integer         null,
+    source_airport_id       integer         null,
+    destination_airport_id  integer         null,
+    stops                   integer         not null,
+    constraint different_airports check (destination_airport_id != source_airport_id),
+    constraint airline_FK foreign key (airline_id) references airlines(id),
+    constraint source_airport_FK foreign key (source_airport_id) references airports(id),
+    constraint destination_airport_FK foreign key (destination_airport_id) references airports(id)
 );

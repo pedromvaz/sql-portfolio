@@ -6,7 +6,7 @@ select
 	sum(case when airline is null then 1 else 0 end) as total_empty_airline_ids,
 	sum(case when source_airport is null or length(trim(source_airport)) = 0 then 1 else 0 end) as total_empty_source_airports,
 	sum(case when source_airport_id is null then 1 else 0 end) as total_empty_source_airport_ids,
-	sum(case when destination_airport is null or length(trim(destination_airport)) = 0 then 1 else 0 end) as total_empty_source_airports,
+	sum(case when destination_airport is null or length(trim(destination_airport)) = 0 then 1 else 0 end) as total_empty_destination_airports,
 	sum(case when destination_airport_id is null then 1 else 0 end) as total_empty_destination_airport_ids,
 	sum(case when codeshare is null or length(trim(codeshare)) = 0 then 1 else 0 end) as total_empty_codeshares,
 	sum(case when stops is null then 1 else 0 end) as total_empty_stops,
