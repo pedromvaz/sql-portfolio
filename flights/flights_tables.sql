@@ -80,13 +80,6 @@ drop table if exists cities;
 drop table if exists countries;
 drop table if exists planes;
 
-drop sequence if exists routes_seq;
-drop sequence if exists airlines_seq;
-drop sequence if exists airports_seq;
-drop sequence if exists cities_seq;
-drop sequence if exists countries_seq;
-drop sequence if exists planes_seq;
-
 
 create sequence if not exists countries_seq;
 
