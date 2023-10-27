@@ -143,6 +143,8 @@ mysql> select count(*) from load_covid_stats;
 1 row in set (1.84 sec)
 ```
 
+Finally, you need to run the SQL INSERT statements inside the file [normalize_covid_data.sql](./normalize_covid_data.sql), so that the data is normalized and populated into the "final" tables.
+
 ## Querying the data
 
 Having all the data inserted correctly in tables `continent`, `location`, and `daily_covid_stats`, I created a new SQL file called [covid_queries.sql](./covid_queries.sql), where I use various SQL elements like `inner join`, `order by`, `group by`, `having`, CTEs, and aggregate functions.

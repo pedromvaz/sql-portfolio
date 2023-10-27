@@ -68,4 +68,9 @@ I decided to create some queries for each dataset, to make some detailed checks 
 - [planes_data_checks.sql](./planes_data_checks.sql)
 - [routes_data_checks.sql](./routes_data_checks.sql)
 
+## Data normalization
+
+In order to reorganize the data in the load tables, to remove any unstructured or redundant data, I created a file called [flights_data_insertion.sql](./flights_data_insertion.sql).
+It contains a series of INSERT statements that populates all the "final" tables with normalized data.
+
 ## Querying the data
