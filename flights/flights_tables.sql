@@ -73,6 +73,7 @@ create table load_routes
 
 -- FINAL TABLES
 
+drop table if exists routes_planes;
 drop table if exists routes;
 drop table if exists airlines;
 drop table if exists airports;
@@ -157,4 +158,13 @@ create table routes
     constraint airline_FK foreign key (airline_id) references airlines(id),
     constraint source_airport_FK foreign key (source_airport_id) references airports(id),
     constraint destination_airport_FK foreign key (destination_airport_id) references airports(id)
+);
+
+
+create table routes_planes
+(
+    route_id    integer     not null,
+    plane_id    integer     not null,
+    constraint route_FK foreign key (route_id) references routes(id),
+    constraint plane_FK foreign key (plane_id) references planes(id)
 );

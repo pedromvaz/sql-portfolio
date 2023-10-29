@@ -1,7 +1,7 @@
 
 -- remove all data from all tables and restart their ID sequences
 
-truncate table routes, airlines, airports, cities, countries, planes;
+truncate table routes, airlines, airports, cities, countries, planes, routes_planes;
 
 alter sequence if exists routes_seq restart with 1;
 alter sequence if exists airlines_seq restart with 1;
@@ -144,3 +144,35 @@ where r.id is null
 and trim(l.airline) != ''
 and trim(l.source_airport) != ''
 and trim(l.destination_airport) != '';
+
+
+-- insert all the planes that travel each route, from the load_routes table into the routes_planes table
+
+select distinct
+    airline,
+    source_airport,
+    destination_airport,
+    unnest(string_to_array(equipment, ' ')) as plane
+into planes_per_route
+from load_routes;
+
+insert into routes_planes (route_id, plane_id)
+select distinct
+	r.id,
+	p.id
+from planes_per_route t
+inner join airlines a
+    on a.iata_code = trim(t.airline)
+    and a.active
+inner join airports s
+    on s.iata_code = trim(t.source_airport)
+inner join airports d
+    on d.iata_code = trim(t.destination_airport)
+inner join routes r
+    on r.airline_id = a.id
+    and r.source_airport_id = s.id
+    and r.destination_airport_id = d.id
+inner join planes p
+    on p.iata_code = t.plane;
+
+drop table planes_per_route;
