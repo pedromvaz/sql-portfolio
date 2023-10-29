@@ -13,6 +13,12 @@ alter sequence if exists planes_seq restart with 1;
 
 -- insert country names and codes from 3 load tables into the countries table
 
+delete from load_countries
+where name = 'India' and dafif_code = 'BS';
+
+delete from load_countries
+where name = 'Palestine' and dafif_code = 'GZ';
+
 insert into countries (name, iso_code, dafif_code)
 select distinct
     trim(l.name),
@@ -24,7 +30,10 @@ left outer join countries c
 where c.id is null
 and trim(l.name) != '';
 
+
 /*
+-- we're not inserting this data, because there are non-country names in this table's column
+-- (e.g. ALL STAR, AIR-MAUR)
 insert into countries (name, iso_code, dafif_code)
 select distinct
     trim(l.country),
@@ -111,10 +120,12 @@ select distinct
     trim(l.icao_code),
     l.altitude
 from load_airports l
-left outer join cities ci
-    on ci.name = trim(l.city)
 left outer join countries co
     on co.name = trim(l.country)
+left outer join cities ci
+    on ci.name = trim(l.city)
+    -- to avoid duplications like London UK, London USA and London Canada
+    and (ci.id is not null and co.id = ci.country_id)
 left outer join airports a
     on a.name = trim(l.name)
 where a.id is null
@@ -143,7 +154,8 @@ left outer join routes r
 where r.id is null
 and trim(l.airline) != ''
 and trim(l.source_airport) != ''
-and trim(l.destination_airport) != '';
+and trim(l.destination_airport) != ''
+and trim(l.source_airport) != trim(l.destination_airport);
 
 
 -- insert all the planes that travel each route, from the load_routes table into the routes_planes table
@@ -154,7 +166,11 @@ select distinct
     destination_airport,
     unnest(string_to_array(equipment, ' ')) as plane
 into planes_per_route
-from load_routes;
+from load_routes
+where trim(coalesce(airline, '')) != ''
+and trim(coalesce(source_airport, '')) != ''
+and trim(coalesce(destination_airport, '')) != ''
+and trim(coalesce(equipment, '')) != '';
 
 insert into routes_planes (route_id, plane_id)
 select distinct

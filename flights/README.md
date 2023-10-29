@@ -68,6 +68,18 @@ I decided to create some queries for each dataset, to make some detailed checks 
 - [planes_data_checks.sql](./planes_data_checks.sql)
 - [routes_data_checks.sql](./routes_data_checks.sql)
 
+In short, here are some alerts that will cause the results from my queries to be less than ideal:
+- Airlines
+  - 70 repeated names (6 for active airlines)
+  - 320 repeated IATA codes (19 for active airlines -- this should not be allowed!)
+  - 4628 empty IATA codes (241 for active airlines)
+- Airports
+  - 36 repeated names (6 of which belong to the same city and country)
+  - 1626 empty IATA codes
+- Planes
+  - 6 repeated IATA codes (different plane models from the same company, still think this should not be allowed!)
+  - 12 empty IATA codes
+
 ## Data normalization
 
 In order to reorganize the data in the load tables, to remove any unstructured or redundant data, I created a file called [flights_data_insertion.sql](./flights_data_insertion.sql).
