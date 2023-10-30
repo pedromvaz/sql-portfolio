@@ -181,8 +181,8 @@ order by
 -- find out how many routes each airline has, and order them from most routes to least routes
 
 select
-    a.name,
-    count(r.id)
+    a.name as airline_name,
+    count(r.id) as total_routes
 from airlines a
 inner join routes r
     on r.airline_id = a.id
@@ -215,7 +215,7 @@ with
         from airline_airport_source_frequency
     )
 select
-    al.name,
+    al.name as airline_name,
     r.frequency,
     string_agg(ap.name, ', ') as airport_names
 from airline_airport_source_frequency_ranked r
@@ -233,8 +233,8 @@ order by al.name;
 -- and order them from most models to least models
 
 select
-    a.name,
-    count(distinct rp.plane_id)
+    a.name as airline_name,
+    count(distinct rp.plane_id) as total_plane_models
 from airlines a
 inner join routes r
     on r.airline_id = a.id
@@ -255,9 +255,164 @@ order by count(distinct rp.plane_id) desc;
 -- later still, "McDonnell Douglas" merged with "Boeing"
 
 select
-    unnest(string_to_array(name, ' ')) as words,
-    count(*)
+    unnest(string_to_array(name, ' ')) as word,
+    count(*) as word_count
 from planes
 group by words
 order by count(*) desc
 limit 5;
+
+
+------------
+-- ROUTES --
+------------
+
+-- find out which routes have at least 1 stop
+
+select
+    al.name as airline_name,
+    concat(ap1.name, ' (', c1.name, ')') as source_airport_name,
+    concat(ap2.name, ' (', c2.name, ')') as destination_airport_name,
+    r.stops
+from routes r
+inner join airlines al
+    on al.id = r.airline_id
+inner join airports ap1
+    on ap1.id = r.source_airport_id
+inner join countries c1
+    on c1.id = ap1.country_id
+inner join airports ap2
+    on ap2.id = r.destination_airport_id
+inner join countries c2
+    on c2.id = ap2.country_id
+where stops > 0
+order by 1, 2, 3;
+
+-- find out how many routes each airport has with other airports from the same country,
+-- counting all airlines, and list them by number of routes in descending order
+
+select
+    a1.name as airport_name,
+    count(*) as total_internal_routes
+from routes r
+inner join airports a1
+    on a1.id = r.source_airport_id
+inner join countries c1
+    on c1.id = a1.country_id
+inner join airports a2
+    on a2.id = r.destination_airport_id
+inner join countries c2
+    on c2.id = a2.country_id
+    and c2.id = c1.id
+group by a1.name
+order by 2 desc;
+
+-- find out the number of internal routes per country, not counting airlines,
+-- and list them by number of routes in descending order
+
+select
+    c2.name as country_name,
+    count(*) as total_routes
+from (select distinct source_airport_id, destination_airport_id from routes) ar
+inner join airports a1
+    on a1.id = ar.source_airport_id
+inner join countries c1
+    on c1.id = a1.country_id
+inner join airports a2
+    on a2.id = ar.destination_airport_id
+inner join countries c2
+    on c2.id = a2.country_id
+    and c2.id = c1.id
+group by c2.name
+order by 2 desc;
+
+-- find out the number of routes between each pair of countries, not counting airlines,
+-- and list them by number of routes in descending order
+
+with
+    country_routes (source_country_name, destination_country_name, total_routes) as
+    (
+        select
+            c1.name as source_country_name,
+            c2.name as destination_country_name,
+            count(*) as total_routes
+        from (select distinct source_airport_id, destination_airport_id from routes) ar
+        inner join airports a1
+            on a1.id = ar.source_airport_id
+        inner join countries c1
+            on c1.id = a1.country_id
+        inner join airports a2
+            on a2.id = ar.destination_airport_id
+        inner join countries c2
+            on c2.id = a2.country_id
+            and c2.id != c1.id
+        group by
+            c1.name,
+            c2.name
+    )
+select
+    case
+        when source_country_name < destination_country_name then source_country_name
+        else destination_country_name
+    end as first_country,
+    case
+        when source_country_name < destination_country_name then destination_country_name
+        else source_country_name
+    end as second_country,
+    sum(total_routes) as total_routes
+from country_routes
+group by
+    first_country,
+    second_country
+order by 3 desc;
+
+-- find out which routes do not have a return route, for each airline
+
+with
+    airline_routes (airline_id, source_airport_id, destination_airport_id) as
+    (
+        select distinct
+            airline_id,
+            source_airport_id,
+            destination_airport_id
+        from routes
+        where airline_id is not null
+        and source_airport_id is not null
+        and destination_airport_id is not null
+    ),
+    one_way_airline_routes (airline_id, source_airport_id, destination_airport_id) as
+    (
+        select
+            airline_id,
+            source_airport_id,
+            destination_airport_id
+        from airline_routes
+
+        except
+
+        select
+            r1.airline_id,
+            r1.source_airport_id,
+            r1.destination_airport_id
+        from airline_routes r1
+        inner join airline_routes r2
+            on r2.airline_id = r1.airline_id
+            and r2.source_airport_id = r1.destination_airport_id
+            and r2.destination_airport_id = r1.source_airport_id
+    )
+select
+    al.name as airline_name,
+    concat(ap1.name, ' (', c1.name, ')') as source_airport_name,
+    concat(ap2.name, ' (', c2.name, ')') as destination_airport_name
+from one_way_airline_routes r
+inner join airlines al
+    on al.id = r.airline_id
+inner join airports ap1
+    on ap1.id = r.source_airport_id
+inner join countries c1
+    on c1.id = ap1.country_id
+inner join airports ap2
+    on ap2.id = r.destination_airport_id
+inner join countries c2
+    on c2.id = ap2.country_id
+order by 1, 2, 3;
