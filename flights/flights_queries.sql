@@ -177,3 +177,87 @@ where total_active >= total_inactive
 and total_active > 0
 order by
     total_active - total_inactive desc;
+
+-- find out how many routes each airline has, and order them from most routes to least routes
+
+select
+    a.name,
+    count(r.id)
+from airlines a
+inner join routes r
+    on r.airline_id = a.id
+group by a.name
+order by count(r.id) desc;
+
+-- find out which is the most frequent source/departure airport for each airline
+
+with
+    airline_airport_source_frequency (airline_id, airport_id, frequency) as
+    (
+        select
+            airline_id,
+            source_airport_id,
+            count(*)
+        from routes
+        where airline_id is not null
+        and source_airport_id is not null
+        group by
+            airline_id,
+            source_airport_id
+    ),
+    airline_airport_source_frequency_ranked (airline_id, airport_id, frequency, rank) as
+    (
+        select
+            airline_id,
+            airport_id,
+            frequency,
+            rank() over (partition by airline_id order by frequency desc)
+        from airline_airport_source_frequency
+    )
+select
+    al.name,
+    r.frequency,
+    string_agg(ap.name, ', ') as airport_names
+from airline_airport_source_frequency_ranked r
+inner join airlines al
+    on al.id = r.airline_id
+inner join airports ap
+    on ap.id = r.airport_id
+where rank = 1
+group by
+    al.name,
+    r.frequency
+order by al.name;
+
+-- find out how many models of planes each active airline uses on their routes,
+-- and order them from most models to least models
+
+select
+    a.name,
+    count(distinct rp.plane_id)
+from airlines a
+inner join routes r
+    on r.airline_id = a.id
+inner join routes_planes rp
+    on rp.route_id = r.id
+group by a.name
+order by count(distinct rp.plane_id) desc;
+
+
+------------
+-- PLANES --
+------------
+
+-- find out which companies have the most plane models
+--
+-- the output "Douglas" is referring to "Douglas Aircraft Company", which later merged
+-- with "McDonnell Aircraft Corporation", to become "McDonnell Douglas"
+-- later still, "McDonnell Douglas" merged with "Boeing"
+
+select
+    unnest(string_to_array(name, ' ')) as words,
+    count(*)
+from planes
+group by words
+order by count(*) desc
+limit 5;

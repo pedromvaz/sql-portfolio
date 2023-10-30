@@ -6,7 +6,7 @@ select
 	sum(case when alias is null or length(trim(alias)) = 0 then 1 else 0 end) as total_empty_aliases,
 	sum(case when iata_code is null or length(trim(iata_code)) = 0 then 1 else 0 end) as total_empty_iata_codes,
 	sum(case when icao_code is null or length(trim(icao_code)) = 0 then 1 else 0 end) as total_empty_icao_codes,
-	sum(case when callsign is null or length(trim(callsign)) = 0 then 1 else 0 end) as total_empty_callsigns,
+	sum(case when call_sign is null or length(trim(call_sign)) = 0 then 1 else 0 end) as total_empty_call_signs,
 	sum(case when country is null or length(trim(country)) = 0 then 1 else 0 end) as total_empty_countries,
 	sum(case when active is null or length(trim(active)) = 0 then 1 else 0 end) as total_empty_actives
 from load_airlines;
@@ -106,30 +106,30 @@ where icao_code in (
 and upper(active) = 'Y'
 order by icao_code;
 
--- check if there are repeated callsigns (44!)
-select callsign, count(*)
+-- check if there are repeated call signs (44!)
+select call_sign, count(*)
 from load_airlines
-where trim(callsign) != ''
-group by callsign
+where trim(call_sign) != ''
+group by call_sign
 having count(*) > 1;
 
--- check if there are repeated callsigns by activity / inactivity (11 active!, 10 inactive)
-select active, callsign, count(*)
+-- check if there are repeated call signs by activity / inactivity (11 active!, 10 inactive)
+select active, call_sign, count(*)
 from load_airlines
-where trim(callsign) != ''
-group by active, callsign
+where trim(call_sign) != ''
+group by active, call_sign
 having count(*) > 1
-order by active desc, callsign;
+order by active desc, call_sign;
 
--- list the active airlines with repeated callsigns (Tyrolean Airways is the only one that's really duplicated)
+-- list the active airlines with repeated call signs (Tyrolean Airways is the only one that's really duplicated)
 select *
 from load_airlines
-where callsign in (
-	select callsign
+where call_sign in (
+	select call_sign
 	from load_airlines
-	where trim(callsign) != ''
+	where trim(call_sign) != ''
 	and upper(active) = 'Y'
-	group by callsign
+	group by call_sign
 	having count(*) > 1
 )
 and upper(active) = 'Y'

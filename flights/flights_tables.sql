@@ -10,7 +10,7 @@ create table load_airlines
     alias       varchar(100) null,
     iata_code   char(3) null,
     icao_code   char(4) null,
-    callsign    varchar(50) null,
+    call_sign   varchar(50) null,
     country     varchar(100) null,
     active      char(1) null,
     constraint load_airlines_PK primary key (id)

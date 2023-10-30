@@ -1,4 +1,4 @@
-id;name;alias;iata_code;icao_code;callsign;country;active
+id;name;alias;iata_code;icao_code;call_sign;country;active
 1;Private flight;;;;;;Y
 2;135 Airways;;;GNL;GENERAL;United States;N
 3;1Time Airline;;1T;RNX;NEXTIME;South Africa;Y
