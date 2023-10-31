@@ -93,7 +93,7 @@ select
     round(avg(altitude)) as average_altitude
 from airports;
 
--- find out which ranges of altitudes (in feet) are most common in airports
+-- find out how common each range of altitudes (in feet) is for airports
 
 create temporary table altitude_ranges
 (
@@ -103,7 +103,7 @@ create temporary table altitude_ranges
 
 do $$
 declare
-    minimum integer := -2000;
+    minimum integer := -2000; -- minimum altitude in the data is -1266 feet
     range integer := 1000;
 begin
     loop
@@ -111,7 +111,7 @@ begin
 
         minimum := minimum + range;
 
-        if minimum > 14000 then
+        if minimum > 14000 then -- maximum altitude in the data is 14472 feet
             exit;
         end if;
     end loop;
@@ -288,8 +288,8 @@ inner join countries c2
 where stops > 0
 order by 1, 2, 3;
 
--- find out how many routes each airport has with other airports from the same country,
--- counting all airlines, and list them by number of routes in descending order
+-- find out how many national routes each airport has, counting all airlines,
+-- and list them by number of routes in descending order
 
 select
     a1.name as airport_name,
@@ -307,7 +307,7 @@ inner join countries c2
 group by a1.name
 order by 2 desc;
 
--- find out the number of internal routes per country, not counting airlines,
+-- find out the number of national routes per country, not counting airlines,
 -- and list them by number of routes in descending order
 
 select
@@ -416,3 +416,26 @@ inner join airports ap2
 inner join countries c2
     on c2.id = ap2.country_id
 order by 1, 2, 3;
+
+-- find out which countries do not have a single route between them (from country A to country B, not both ways)
+
+select
+    c1.name as source_country,
+    c2.name as destination_country
+from countries c1
+cross join countries c2
+
+except
+
+select distinct
+    c1.name,
+    c2.name
+from routes r
+inner join airports a1
+    on a1.id = r.source_airport_id
+inner join countries c1
+    on c1.id = a1.country_id
+inner join airports a2
+    on a2.id = r.destination_airport_id
+inner join countries c2
+    on c2.id = a2.country_id;
