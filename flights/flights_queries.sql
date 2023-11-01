@@ -97,8 +97,8 @@ from airports;
 
 create temporary table altitude_ranges
 (
-    minimum     integer     not null,
-    maximum     integer     not null
+    minimum_altitude    integer     not null,
+    maximum_altitude    integer     not null
 );
 
 do $$
@@ -118,21 +118,34 @@ begin
 end $$;
 
 select
-    ar.minimum,
-    ar.maximum,
-    count(*)
+    ar.minimum_altitude,
+    ar.maximum_altitude,
+    count(*) as number_of_airports
 from altitude_ranges ar
 inner join airports a
-    on a.altitude >= ar.minimum
-    and a.altitude < ar.maximum
+    on a.altitude >= ar.minimum_altitude
+    and a.altitude < ar.maximum_altitude
 group by
-    ar.minimum,
-    ar.maximum
+    ar.minimum_altitude,
+    ar.maximum_altitude
 order by
-    ar.minimum;
+    ar.minimum_altitude;
 
 drop table altitude_ranges;
 
+-- find out how common each range of altitudes (in feet) is for airports
+-- (same as before, but simpler code)
+
+select
+    floor(altitude / 1000.0) * 1000.0 as minimum_altitude,
+    ceil((altitude + 0.1) / 1000.0) * 1000.0 as maximum_altitude,
+    count(*) as number_of_airports
+from airports
+group by
+    minimum_altitude,
+    maximum_altitude
+order by
+    1;
 
 --------------
 -- AIRLINES --
@@ -439,3 +452,30 @@ inner join airports a2
     on a2.id = r.destination_airport_id
 inner join countries c2
     on c2.id = a2.country_id;
+
+-- list all countries and the number of countries they are connected to, in descending order
+
+with
+    connected_countries (source_country_name, destination_country_name) as
+    (
+        select distinct
+            c1.name as source_country_name,
+            c2.name as destination_country_name
+        from routes r
+        inner join airports a1
+            on a1.id = r.source_airport_id
+        inner join countries c1
+            on c1.id = a1.country_id
+        inner join airports a2
+            on a2.id = r.destination_airport_id
+        inner join countries c2
+            on c2.id = a2.country_id
+            and c2.id != c1.id
+        order by c1.name
+    )
+select
+    source_country_name,
+    count(*) as total_connected_countries
+from connected_countries
+group by source_country_name
+order by 2 desc, 1;
